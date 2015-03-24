@@ -18,11 +18,11 @@
  *  Same row multiple difference and Same column multiple difference is pending
  */
 
-public class Main {
+public class PlayFair {
 
 	private static char sbox[][] = new char[5][5];
 	private static char sel = 'j'; // i will be replaced instead of j
-	private static String plainText = "prathyush";
+	private static String plainText = "Hello World";
 	private static String key = "Hello";
 	private static char str[];
 	private static int place[]=new int[4];
@@ -81,7 +81,7 @@ public class Main {
 			}
 			
 			
-			if((place[1]-place[3]!=-4) && (place[1]-place[3]!=4) && place[0]==place[2])
+			if((place[1]-place[3]!=-4) && (place[1]-place[3]!=4) && place[1]==place[3])
 					{
 						System.out.print(sbox[place[0]+1][place[1]]);
 						System.out.println(sbox[place[0]][place[1]]);
