@@ -12,43 +12,107 @@
  *  Sbox generation - Fill the key
  *  				- Fill the remaining alphabets
  *  
- *  The i/j option is said to be selected using sel variable.
+ *  The i/j option is said to be selected using 'sel' variable.
+ *  Rectangle formula applied
+ *  Reverse column and reverse row are pending
+ *  Same row multiple difference and Same column multiple difference is pending
  */
 
 public class Main {
 
 	private static char sbox[][] = new char[5][5];
 	private static char sel = 'j'; // i will be replaced instead of j
-	private static String plainText = "Hello World";
+	private static String plainText = "prathyush";
 	private static String key = "Hello";
 	private static char str[];
-
+	private static int place[]=new int[4];
+	private static boolean spos[]=new boolean[100];
+	private static String cipher;
+	
 	public static void main(String args[]) {		
 		textConv();
 		sBoxGen();
-		printSbox();
-		int p = 0,q=0,r=0,s=0;
-		for(int k=0;k<plainText.length()/2;k+=2)
-			if(str[k]==32)			
-				k++;
-			else
-			{
-				for(int i=0;i<5;i++)
-					for(int j=0;j<5;j++)
-						if(sbox[i][j]==str[k])
-						{
-							p=i;
-							q=j;
-							System.out.println(p+":"+q);
-						}
-						else if(sbox[i][j]==str[k+1])
-						{
-							r=i;
-							s=j;
-							System.out.println(r+":"+s);
-
-						}
+		printSbox();		
+		cipher();			
+ 	}
+	
+	public static void cipher()
+	{
+		for(int i=0;i<plainText.length();i+=2)
+		{
+			findText(str[i], str[i+1]);
+			
+			//case 1 : Rectangle Formation
+			if(place[0]!=place[2] && place[1]!=place[3])
+			{	
+				System.out.print(sbox[place[0]][place[1]]);
+				System.out.print(sbox[place[2]][place[3]]);
+				System.out.print(":");
+				System.out.print(sbox[place[0]][place[3]]);
+				System.out.println(sbox[place[2]][place[1]]);
 			}
+			
+			//Same row
+			if(place[0]==place[2] )
+			{
+				
+				System.out.print(sbox[place[0]][place[1]]);
+				System.out.print(sbox[place[2]][place[3]]);
+				System.out.print(":");
+				System.out.print(sbox[place[2]][place[3]]);
+				if(place[3]+1>5)
+					System.out.println(sbox[place[2]][place[3]+1-5]);
+				else
+					System.out.println(sbox[place[2]][place[3]+1]);
+					
+			}
+			
+			//Same column
+			if(place[1]==place[3] ) 
+			{
+				System.out.print(sbox[place[0]][place[1]]);
+				System.out.print(sbox[place[2]][place[3]]);
+				System.out.print(":");
+				System.out.print(sbox[place[2]][place[3]]);
+				if(place[0]-1<0)
+					System.out.println(sbox[place[0]-1+5][place[1]]);
+				else
+					System.out.println(sbox[place[0]-1][place[1]]);				
+			}
+			
+			
+			if((place[1]-place[3]!=-4) && (place[1]-place[3]!=4) && place[0]==place[2])
+					{
+						System.out.print(sbox[place[0]+1][place[1]]);
+						System.out.println(sbox[place[0]][place[1]]);
+					}
+			
+			 if((place[0]-place[2]!=4)&&(place[0]-place[2]!=-4)&& place[0]==place[2])
+			 {
+
+					System.out.print(sbox[place[0]][place[1]+1]);
+					System.out.print(sbox[place[0]][place[1]]);
+			 }			
+		}			
+	}
+	
+	public static int[] findText(char a, char b)
+	{
+		
+		for(int i=0;i<5;i++)
+			for(int j=0;j<5;j++){
+				if(sbox[i][j]==a)
+				{
+					place[0]=i;
+					place[1]=j;
+				}
+				else if(sbox[i][j]==b)
+				{
+					place[2]=i;
+					place[3]=j;
+				}
+			}
+		return place;					
 	}
 
 	//convert and divide the text
@@ -56,24 +120,29 @@ public class Main {
 	{
 		plainText = plainText.toLowerCase();
 		str = plainText.toCharArray();
-		int space=0;
+		
 		for(int i=0;i<plainText.length();i++)
 		{
 			if (str[i]==32){
-				space++;
+				spos[i]=true;								
 				break;
 			}
 			if(i!=0)
 				if(str[i-1]==str[i])
 					str[i]='x'; // Replace repeated values with 'x'
 		}
-		if((plainText.length()-space)%2!=0)
+		
+		plainText=new String(str);
+		plainText=plainText.replaceAll("\\s+","");
+		if(plainText.length()%2!=0)
 		{
-			str[plainText.length()-1]='x';
-			plainText=str.toString();			
+			plainText=plainText+'x';		
 		}
+		
+		
+		str=plainText.toCharArray();
 		System.out.print("Converted text: ");
-		System.out.println(str);
+		System.out.println(plainText);
 	}
 
 
@@ -97,6 +166,11 @@ public class Main {
 				keyUp[n++]=k[i-1];
 		keyUp[n++]=k[k.length-1];
 		keyUp[n++]='!';	
+		
+		System.out.print("Key: ");;
+		for(int i=0;keyUp[i]!='!';i++)
+			System.out.print(keyUp[i]);
+		System.out.println();
 		
 		initSbox();
 		// Change the values of the boolean array to false
@@ -145,9 +219,7 @@ public class Main {
 			}
 			System.out.println("\t");
 		}
-
 		System.out.println();
-
 	}
 
 	// Function used to initialize SBox
@@ -155,5 +227,8 @@ public class Main {
 		for (int i = 0; i < 5; i++)
 			for (int j = 0; j < 5; j++)
 				sbox[i][j] = '0';
+		
+		for (int i = 0; i < 100; i++)
+			spos[i]=false;		
 	}
 }
